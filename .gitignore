@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.*
+*.env
+*.env.*
+!.env.example
+runs/
+validation/
+.codex/
+.DS_Store
+*.log

@@ -1,0 +1,13 @@
+# Replace every /absolute/path placeholder before using this template.
+[mcp_servers.jev_tools]
+command = "node"
+args = [
+  "--env-file=/absolute/path/to/private.env",
+  "/absolute/path/to/jev-tool-runner/dist/cli.js",
+  "serve",
+  "--root", "/absolute/path/to/project",
+  "--config", "/absolute/path/to/reviewed-tools.json",
+]
+startup_timeout_sec = 15
+tool_timeout_sec = 120
+enabled_tools = ["run_tools"]

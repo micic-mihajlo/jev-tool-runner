@@ -1,0 +1,842 @@
+{
+  "experiment": "jev-first",
+  "recordedAt": "2026-09-18T13:43:56.785Z",
+  "model": "gpt-5.6-sol",
+  "effort": "medium",
+  "serviceTier": "priority",
+  "codexVersion": "codex-cli 0.153.4",
+  "repeats": 3,
+  "costBasis": {
+    "codex": "API-equivalent estimate, not a subscription invoice",
+    "fast": {
+      "inputPerMillion": 8,
+      "cachedPerMillion": 0.8,
+      "cacheWritePerMillion": 10,
+      "outputPerMillion": 40
+    },
+    "standard": {
+      "inputPerMillion": 4,
+      "cachedPerMillion": 0.4,
+      "cacheWritePerMillion": 5,
+      "outputPerMillion": 20
+    },
+    "jev": {
+      "inputPerMillion": 0.042,
+      "outputPerMillion": 0
+    },
+    "sources": [
+      "https://developers.openai.com/api/docs/pricing",
+      "https://docs.typesafe.ai/models"
+    ]
+  },
+  "publicationNote": "Curated numeric export. Timing, provider usage and outcome assertions are unchanged; raw session logs, local paths and final-answer text are not published.",
+  "results": [
+    {
+      "id": "membership-fix-1-baseline",
+      "scenario": "membership-fix",
+      "repeat": 1,
+      "arm": "baseline",
+      "elapsedMs": 41766,
+      "startupMs": 419,
+      "firstItemAtMs": 419,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 103918,
+        "cached_input_tokens": 93568,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1789,
+        "reasoning_output_tokens": 466
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 6,
+        "fileChangeItems": 1,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "decisions": 0,
+        "toolCalls": 0,
+        "totalMs": 0,
+        "statuses": []
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "independentTestsPass": true,
+          "onlyImplementationChanged": true,
+          "modelReportedPassingCheck": true
+        }
+      }
+    },
+    {
+      "id": "membership-fix-1-jev",
+      "scenario": "membership-fix",
+      "repeat": 1,
+      "arm": "jev",
+      "elapsedMs": 15441,
+      "startupMs": 153,
+      "firstItemAtMs": 2513,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 33408,
+        "cached_input_tokens": 25472,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 342,
+        "reasoning_output_tokens": 78
+      },
+      "counts": {
+        "coderInvocations": 1,
+        "nativeCommandCalls": 0,
+        "fileChangeItems": 1,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 2,
+        "inputTokens": 6576,
+        "outputTokens": 770,
+        "decisions": 4,
+        "toolCalls": 4,
+        "totalMs": 2303,
+        "statuses": [
+          "needs_coding_agent",
+          "returned_results"
+        ]
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "independentTestsPass": true,
+          "onlyImplementationChanged": true,
+          "modelReportedPassingCheck": true
+        }
+      }
+    },
+    {
+      "id": "source-inspection-1-jev",
+      "scenario": "source-inspection",
+      "repeat": 1,
+      "arm": "jev",
+      "elapsedMs": 25698,
+      "startupMs": 245,
+      "firstItemAtMs": 4864,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 22478,
+        "cached_input_tokens": 9088,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 873,
+        "reasoning_output_tokens": 199
+      },
+      "counts": {
+        "coderInvocations": 1,
+        "nativeCommandCalls": 0,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 1,
+        "inputTokens": 33218,
+        "outputTokens": 2597,
+        "decisions": 7,
+        "toolCalls": 6,
+        "totalMs": 3859,
+        "statuses": [
+          "returned_results"
+        ]
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "citesWorkspaceSource": true,
+          "sourceEvidenceCollected": true,
+          "describesRevision": true,
+          "describesExecutedSuppression": true,
+          "describesModificationTime": true,
+          "describesSize": true
+        }
+      }
+    },
+    {
+      "id": "source-inspection-1-baseline",
+      "scenario": "source-inspection",
+      "repeat": 1,
+      "arm": "baseline",
+      "elapsedMs": 81767,
+      "startupMs": 178,
+      "firstItemAtMs": 178,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 87180,
+        "cached_input_tokens": 64768,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2652,
+        "reasoning_output_tokens": 651
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 7,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "decisions": 0,
+        "toolCalls": 0,
+        "totalMs": 0,
+        "statuses": []
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "citesWorkspaceSource": true,
+          "sourceEvidenceCollected": true,
+          "describesRevision": true,
+          "describesExecutedSuppression": true,
+          "describesModificationTime": true,
+          "describesSize": true
+        }
+      }
+    },
+    {
+      "id": "project-checks-1-baseline",
+      "scenario": "project-checks",
+      "repeat": 1,
+      "arm": "baseline",
+      "elapsedMs": 16306,
+      "startupMs": 183,
+      "firstItemAtMs": 183,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 32578,
+        "cached_input_tokens": 24832,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 388,
+        "reasoning_output_tokens": 50
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 2,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "decisions": 0,
+        "toolCalls": 0,
+        "totalMs": 0,
+        "statuses": []
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "actualTestsPassed": true,
+          "actualTypecheckPassed": true,
+          "reportedBothChecks": true
+        }
+      }
+    },
+    {
+      "id": "project-checks-1-jev",
+      "scenario": "project-checks",
+      "repeat": 1,
+      "arm": "jev",
+      "elapsedMs": 5528,
+      "startupMs": 149,
+      "firstItemAtMs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 0,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_output_tokens": 0
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 0,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 1,
+        "inputTokens": 6628,
+        "outputTokens": 1180,
+        "decisions": 3,
+        "toolCalls": 2,
+        "totalMs": 5372,
+        "statuses": [
+          "returned_results"
+        ]
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "actualTestsPassed": true,
+          "actualTypecheckPassed": true,
+          "reportedBothChecks": true
+        }
+      }
+    },
+    {
+      "id": "membership-fix-2-jev",
+      "scenario": "membership-fix",
+      "repeat": 2,
+      "arm": "jev",
+      "elapsedMs": 22112,
+      "startupMs": 219,
+      "firstItemAtMs": 2457,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 52159,
+        "cached_input_tokens": 43008,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 833,
+        "reasoning_output_tokens": 230
+      },
+      "counts": {
+        "coderInvocations": 1,
+        "nativeCommandCalls": 1,
+        "fileChangeItems": 1,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 2,
+        "inputTokens": 6567,
+        "outputTokens": 770,
+        "decisions": 4,
+        "toolCalls": 4,
+        "totalMs": 2176,
+        "statuses": [
+          "needs_coding_agent",
+          "returned_results"
+        ]
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "independentTestsPass": true,
+          "onlyImplementationChanged": true,
+          "modelReportedPassingCheck": true
+        }
+      }
+    },
+    {
+      "id": "membership-fix-2-baseline",
+      "scenario": "membership-fix",
+      "repeat": 2,
+      "arm": "baseline",
+      "elapsedMs": 44655,
+      "startupMs": 181,
+      "firstItemAtMs": 181,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 124821,
+        "cached_input_tokens": 103936,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2018,
+        "reasoning_output_tokens": 293
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 11,
+        "fileChangeItems": 1,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "decisions": 0,
+        "toolCalls": 0,
+        "totalMs": 0,
+        "statuses": []
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "independentTestsPass": true,
+          "onlyImplementationChanged": true,
+          "modelReportedPassingCheck": true
+        }
+      }
+    },
+    {
+      "id": "source-inspection-2-baseline",
+      "scenario": "source-inspection",
+      "repeat": 2,
+      "arm": "baseline",
+      "elapsedMs": 55155,
+      "startupMs": 166,
+      "firstItemAtMs": 166,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 122059,
+        "cached_input_tokens": 101376,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 3490,
+        "reasoning_output_tokens": 1120
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 8,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "decisions": 0,
+        "toolCalls": 0,
+        "totalMs": 0,
+        "statuses": []
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "citesWorkspaceSource": true,
+          "sourceEvidenceCollected": true,
+          "describesRevision": true,
+          "describesExecutedSuppression": true,
+          "describesModificationTime": true,
+          "describesSize": true
+        }
+      }
+    },
+    {
+      "id": "source-inspection-2-jev",
+      "scenario": "source-inspection",
+      "repeat": 2,
+      "arm": "jev",
+      "elapsedMs": 22388,
+      "startupMs": 133,
+      "firstItemAtMs": 3222,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 21647,
+        "cached_input_tokens": 9088,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1126,
+        "reasoning_output_tokens": 311
+      },
+      "counts": {
+        "coderInvocations": 1,
+        "nativeCommandCalls": 0,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 1,
+        "inputTokens": 24575,
+        "outputTokens": 2236,
+        "decisions": 6,
+        "toolCalls": 5,
+        "totalMs": 2898,
+        "statuses": [
+          "returned_results"
+        ]
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "citesWorkspaceSource": true,
+          "sourceEvidenceCollected": true,
+          "describesRevision": true,
+          "describesExecutedSuppression": true,
+          "describesModificationTime": true,
+          "describesSize": true
+        }
+      }
+    },
+    {
+      "id": "project-checks-2-jev",
+      "scenario": "project-checks",
+      "repeat": 2,
+      "arm": "jev",
+      "elapsedMs": 4635,
+      "startupMs": 138,
+      "firstItemAtMs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 0,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_output_tokens": 0
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 0,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 1,
+        "inputTokens": 6608,
+        "outputTokens": 1180,
+        "decisions": 3,
+        "toolCalls": 2,
+        "totalMs": 4490,
+        "statuses": [
+          "returned_results"
+        ]
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "actualTestsPassed": true,
+          "actualTypecheckPassed": true,
+          "reportedBothChecks": true
+        }
+      }
+    },
+    {
+      "id": "project-checks-2-baseline",
+      "scenario": "project-checks",
+      "repeat": 2,
+      "arm": "baseline",
+      "elapsedMs": 16538,
+      "startupMs": 759,
+      "firstItemAtMs": 759,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 32611,
+        "cached_input_tokens": 24832,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 416,
+        "reasoning_output_tokens": 31
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 2,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "decisions": 0,
+        "toolCalls": 0,
+        "totalMs": 0,
+        "statuses": []
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "actualTestsPassed": true,
+          "actualTypecheckPassed": true,
+          "reportedBothChecks": true
+        }
+      }
+    },
+    {
+      "id": "membership-fix-3-baseline",
+      "scenario": "membership-fix",
+      "repeat": 3,
+      "arm": "baseline",
+      "elapsedMs": 33581,
+      "startupMs": 185,
+      "firstItemAtMs": 185,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 87893,
+        "cached_input_tokens": 77568,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1564,
+        "reasoning_output_tokens": 306
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 3,
+        "fileChangeItems": 1,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "decisions": 0,
+        "toolCalls": 0,
+        "totalMs": 0,
+        "statuses": []
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "independentTestsPass": true,
+          "onlyImplementationChanged": true,
+          "modelReportedPassingCheck": true
+        }
+      }
+    },
+    {
+      "id": "membership-fix-3-jev",
+      "scenario": "membership-fix",
+      "repeat": 3,
+      "arm": "jev",
+      "elapsedMs": 20701,
+      "startupMs": 162,
+      "firstItemAtMs": 3026,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 33370,
+        "cached_input_tokens": 25472,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 297,
+        "reasoning_output_tokens": 66
+      },
+      "counts": {
+        "coderInvocations": 1,
+        "nativeCommandCalls": 0,
+        "fileChangeItems": 1,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 2,
+        "inputTokens": 6567,
+        "outputTokens": 770,
+        "decisions": 4,
+        "toolCalls": 4,
+        "totalMs": 2351,
+        "statuses": [
+          "needs_coding_agent",
+          "returned_results"
+        ]
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "independentTestsPass": true,
+          "onlyImplementationChanged": true,
+          "modelReportedPassingCheck": true
+        }
+      }
+    },
+    {
+      "id": "source-inspection-3-jev",
+      "scenario": "source-inspection",
+      "repeat": 3,
+      "arm": "jev",
+      "elapsedMs": 24678,
+      "startupMs": 218,
+      "firstItemAtMs": 3586,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 21647,
+        "cached_input_tokens": 9088,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1265,
+        "reasoning_output_tokens": 306
+      },
+      "counts": {
+        "coderInvocations": 1,
+        "nativeCommandCalls": 0,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 1,
+        "inputTokens": 24575,
+        "outputTokens": 2236,
+        "decisions": 6,
+        "toolCalls": 5,
+        "totalMs": 3081,
+        "statuses": [
+          "returned_results"
+        ]
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "citesWorkspaceSource": true,
+          "sourceEvidenceCollected": true,
+          "describesRevision": true,
+          "describesExecutedSuppression": true,
+          "describesModificationTime": true,
+          "describesSize": true
+        }
+      }
+    },
+    {
+      "id": "source-inspection-3-baseline",
+      "scenario": "source-inspection",
+      "repeat": 3,
+      "arm": "baseline",
+      "elapsedMs": 47171,
+      "startupMs": 192,
+      "firstItemAtMs": 192,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 133480,
+        "cached_input_tokens": 109696,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2808,
+        "reasoning_output_tokens": 742
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 8,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "decisions": 0,
+        "toolCalls": 0,
+        "totalMs": 0,
+        "statuses": []
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "citesWorkspaceSource": true,
+          "sourceEvidenceCollected": true,
+          "describesRevision": true,
+          "describesExecutedSuppression": true,
+          "describesModificationTime": true,
+          "describesSize": true
+        }
+      }
+    },
+    {
+      "id": "project-checks-3-baseline",
+      "scenario": "project-checks",
+      "repeat": 3,
+      "arm": "baseline",
+      "elapsedMs": 16673,
+      "startupMs": 204,
+      "firstItemAtMs": 204,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 32553,
+        "cached_input_tokens": 24832,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 427,
+        "reasoning_output_tokens": 102
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 2,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "decisions": 0,
+        "toolCalls": 0,
+        "totalMs": 0,
+        "statuses": []
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "actualTestsPassed": true,
+          "actualTypecheckPassed": true,
+          "reportedBothChecks": true
+        }
+      }
+    },
+    {
+      "id": "project-checks-3-jev",
+      "scenario": "project-checks",
+      "repeat": 3,
+      "arm": "jev",
+      "elapsedMs": 4958,
+      "startupMs": 142,
+      "firstItemAtMs": null,
+      "exitCode": 0,
+      "timedOut": false,
+      "usage": {
+        "input_tokens": 0,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_output_tokens": 0
+      },
+      "counts": {
+        "coderInvocations": 0,
+        "nativeCommandCalls": 0,
+        "fileChangeItems": 0,
+        "mcpCalls": 0,
+        "reasoningItems": 0
+      },
+      "jev": {
+        "runs": 1,
+        "inputTokens": 6626,
+        "outputTokens": 1180,
+        "decisions": 3,
+        "toolCalls": 2,
+        "totalMs": 4810,
+        "statuses": [
+          "returned_results"
+        ]
+      },
+      "grading": {
+        "passed": true,
+        "assertions": {
+          "unchanged": true,
+          "actualTestsPassed": true,
+          "actualTypecheckPassed": true,
+          "reportedBothChecks": true
+        }
+      }
+    }
+  ]
+}

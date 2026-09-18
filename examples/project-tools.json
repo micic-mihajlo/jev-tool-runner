@@ -1,0 +1,19 @@
+{
+  "commands": [
+    {
+      "id": "tests",
+      "description": "Build and run this runner's HTTP, filesystem, process, and MCP integration tests",
+      "argv": ["npm", "test"],
+      "timeoutMs": 30000
+    },
+    {
+      "id": "typecheck",
+      "description": "Check this TypeScript project without emitting files",
+      "argv": ["npm", "run", "check"],
+      "timeoutMs": 30000
+    }
+  ],
+  "maxSteps": 10,
+  "timeoutMs": 90000,
+  "maxCandidates": 96
+}

@@ -1,0 +1,12 @@
+{
+  "commands": [
+    {
+      "id": "membership-tests",
+      "description": "Run membership access tests, including the removed-member scenario.",
+      "argv": ["node", "--test", "test/access.test.mjs"],
+      "timeoutMs": 10000
+    }
+  ],
+  "maxSteps": 8,
+  "timeoutMs": 90000
+}

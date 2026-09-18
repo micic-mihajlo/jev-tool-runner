@@ -1,0 +1,37 @@
+{
+  "name": "jev-tool-runner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Let Jev choose and execute a sequence of developer tools without a generative model between calls.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "jev-tools": "./dist/cli.js"
+  },
+  "exports": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "start": "node dist/cli.js",
+    "test:supervisor": "node --test scripts/supervisor.test.mjs",
+    "test:accounting": "node --test scripts/benchmark-report.test.mjs",
+    "test:all": "npm test && npm run test:supervisor && npm run test:accounting",
+    "diagram": "d2 --layout elk --theme 0 --pad 24 docs/diagrams/architecture.d2 docs/diagrams/architecture.svg"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@typesafe-ai/sdk": "^0.6.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.3",
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/micic-mihajlo/jev-tool-runner.git"
+  }
+}
