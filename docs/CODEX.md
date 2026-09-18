@@ -1,5 +1,7 @@
 # Use the MCP tool in Codex
 
+For automatic use in normal sessions, follow [hooks + MCP installation](DAILY-USE.md). The setup below registers only the MCP tool; it does not automatically invoke Jev.
+
 Build the package first with `npm ci && npm run build`. Keep the TypeSafe key in a private environment file. Choose a fixed repository root and a reviewed command configuration.
 
 Copy [the TOML template](../integration/codex.project.toml) into the trusted project's `.codex/config.toml`, replacing every absolute-path placeholder. Use an absolute Node executable path if `node` is unavailable on the desktop app's PATH. The tool timeout should exceed the runner's configured time budget.

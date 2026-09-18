@@ -19,11 +19,14 @@
     "test:supervisor": "node --test scripts/supervisor.test.mjs",
     "test:accounting": "node --test scripts/benchmark-report.test.mjs",
     "test:all": "npm test && npm run test:supervisor && npm run test:accounting",
-    "diagram": "d2 --layout elk --theme 0 --pad 24 docs/diagrams/architecture.d2 docs/diagrams/architecture.svg"
+    "diagram": "d2 --layout elk --theme 0 --pad 24 docs/diagrams/architecture.d2 docs/diagrams/architecture.svg && d2 --layout elk --theme 0 --pad 24 docs/diagrams/supervisor.d2 docs/diagrams/supervisor.svg",
+    "codex:install": "npm run build && node scripts/codex-integration.mjs install",
+    "codex:doctor": "node scripts/codex-integration.mjs doctor"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@typesafe-ai/sdk": "^0.6.0",
+    "smol-toml": "^1.8.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {

@@ -1,0 +1,41 @@
+direction: down
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 0
+  }
+}
+classes: {
+  model: {style: {fill: "#E5EEFF"; stroke: "#315BB5"; border-radius: 10}}
+  code: {style: {fill: "#E8F5EF"; stroke: "#318065"; border-radius: 10}}
+  result: {style: {fill: "#FFF4DC"; stroke: "#AB7C27"; border-radius: 10}}
+}
+task: "Task + workspace + allowed commands" {class: code}
+loop: "JEV TOOL LOOP — no coding-model call between tools" {
+  direction: right
+  style: {fill: "#F8FAFC"; stroke: "#CBD5E1"; border-radius: 14}
+  candidates: "Assemble concrete calls\nfrom current workspace" {class: code}
+  jev: "Jev chooses\none next action" {class: model}
+  execute: "Execute selected tool\nread · search · Git · check" {class: code}
+  candidates -> jev
+  jev -> execute: tool selected
+  execute -> candidates: observed output + fresh state
+}
+evidence: "Collected evidence\noutputs + exit codes" {class: code}
+route: "Only completed\ncommand results?" {shape: diamond}
+coder: "Codex edits or explains\nusing collected evidence" {class: model}
+changed: "Workspace\nchanged?" {shape: diamond}
+verify: "Verify changed code\nReplay prior checks directly;\nJev selects checks if needed" {class: code}
+retry: "Checks failed?\nCoding attempt remaining?" {shape: diamond}
+result: "Return result + measured usage\nActual exit codes determine check status" {class: result}
+task -> loop.candidates
+loop.jev -> evidence: return / handoff
+ evidence -> route
+route -> result: yes — no Codex call
+route -> coder: no — edit / explanation needed
+coder -> changed
+changed -> result: no change — explanation
+changed -> verify: code changed
+verify -> retry
+retry -> coder: failed + retry available
+retry -> result: passed / exhausted / incomplete

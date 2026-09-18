@@ -73,7 +73,7 @@ async function manifest(root, prefix = "") {
 
 const snapshot = path.join(scratch, "project-snapshot");
 await mkdir(snapshot);
-for (const name of ["src", "test", "examples", "dist", "package.json", "package-lock.json", "tsconfig.json", ".gitignore", "README.md"]) {
+for (const name of ["src", "test", "scripts", "examples", "dist", "package.json", "package-lock.json", "tsconfig.json", ".gitignore", "README.md"]) {
   await cp(path.join(packageRoot, name), path.join(snapshot, name), { recursive: true });
 }
 const metadata = {

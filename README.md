@@ -4,18 +4,19 @@
 
 Jev chooses concrete source reads, searches, Git inspections, and configured commands. The runner executes each choice immediately and feeds the result back to Jev. Codex handles edits and explanations; the runner handles verification and a bounded repair retry.
 
-This is an experimental TypeScript/Node implementation with two entry points:
+Use it in ordinary Codex sessions with automatic hooks, or launch the standalone supervisor:
 
 | Mode | Who starts the task? | Use it for |
 | --- | --- | --- |
+| **Codex hooks + MCP (daily use)** | Your normal Codex session | Automatic evidence before reasoning, reuse checks, and verification after edits |
 | **Jev-first CLI** | Jev, then Codex when needed | A complete investigation, edit, and verification cycle |
 | **MCP tool** | Your existing coding agent | Delegating an investigation or exact checks inside Codex |
 
 It does not replace Codex's built-in tool dispatcher. Jev selects from calls assembled by code; it does not generate patches or arbitrary shell commands.
 
-![Jev-first architecture](docs/diagrams/architecture.svg)
+![Everyday Codex integration](docs/diagrams/architecture.svg)
 
-[Architecture and D2 source](docs/ARCHITECTURE.md) · [Benchmarks](docs/benchmarks/README.md) · [Codex MCP setup](docs/CODEX.md)
+[Daily-use setup](docs/DAILY-USE.md) · [Architecture and D2 source](docs/ARCHITECTURE.md) · [Benchmarks](docs/benchmarks/README.md) · [Codex MCP setup](docs/CODEX.md)
 
 ## Quick start
 
@@ -30,6 +31,24 @@ cp .env.example .env
 ```
 
 Set `TYPESAFE_API_KEY` in `.env`. That file is ignored by Git. The default model is `jev-1.13.0`.
+
+Install into this checkout for everyday use:
+
+```sh
+npm run codex:install -- --root "$PWD" \
+  --config examples/project-tools.json --key-file .env \
+  --verify tests,typecheck
+```
+
+Open a new trusted Codex session here and review/trust the definitions in `/hooks`. Then submit tasks normally: Jev automatically gathers bounded read-only evidence before Codex reasons, and the Stop hook runs the selected checks after edits. For another repository, use its absolute root and reviewed command configuration.
+
+```sh
+npm run codex:doctor -- --root "$PWD"
+```
+
+The doctor shows configuration health and recent observed hook activity. Hook installation alone does not prove execution. Provider outages visibly fall back to normal Codex; this is scoped workflow automation, not universal tool enforcement. See [daily-use behavior, limits, updates, and uninstall](docs/DAILY-USE.md).
+
+### Standalone read-only investigation
 
 Try a read-only investigation of the included deliberately broken fixture:
 
@@ -85,7 +104,9 @@ For exact checks, bypass model decisions:
 
 Use command IDs from your configuration. Omit `commandIds` when diagnosis is needed. The server manages the step budget; callers do not supply `maxSteps`. Reuse returned evidence and inspect exit codes before claiming success.
 
-## Results so far
+## Earlier supervisor benchmark
+
+These results measure the standalone supervisor, **not the new daily-use hooks**.
 
 An 18-run paired experiment used three tasks, three repeats per arm, and the same requested Codex model/settings (GPT-5.6 Sol, medium reasoning, priority service):
 
@@ -103,7 +124,7 @@ These are small-task results, not broad coding-agent performance claims. Dollar 
 ## Development
 
 ```sh
-npm run test:all  # 17 runner + 6 supervisor + 3 accounting tests
+npm run test:all  # runner, hook/installer, supervisor, and accounting tests
 npm run check
 ```
 
@@ -120,6 +141,6 @@ npm run diagram
 - Jev's available actions are bounded: permitted source reads, literal searches, directory listings, scoped Git inspection, and allowlisted command arguments. Missing candidates can limit an investigation.
 - Commands use `shell: false` and do not inherit the TypeSafe key. Configured commands can execute project code with the server's operating-system permissions; the tool runner is not an OS sandbox.
 - Selected source and tool output are sent to TypeSafe. The coding phase sends its goal and collected evidence to Codex. Conventional secret paths are excluded and known credentials are redacted, but arbitrary source can still contain sensitive data.
-- Codex edits run through its workspace-write sandbox. There is a 180-second supervisor budget and at most two coding attempts. Browser/computer control and third-party MCP tool adapters are not implemented.
+- Codex edits run through its workspace-write sandbox. Automatic hooks have their own bounded budgets and do not sandbox configured checks. There is a 180-second supervisor budget and at most two coding attempts. Browser/computer control and third-party MCP tool adapters are not implemented.
 
 [TypeSafe System One](https://docs.typesafe.ai/concepts/system-one) · [JavaScript SDK](https://docs.typesafe.ai/sdk/javascript) · [Choice primitive](https://docs.typesafe.ai/primitives/choice)

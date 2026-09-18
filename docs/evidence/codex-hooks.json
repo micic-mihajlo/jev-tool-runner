@@ -1,0 +1,121 @@
+{
+  "codexVersion": "0.153.4",
+  "purpose": "End-to-end hook execution smoke checks, not a comparative benchmark",
+  "configuration": "Isolated Codex defaults; vetted fixture hooks supplied as inline configuration; per-invocation hook trust bypass only in the disposable test harness",
+  "initialSetupFailure": "An earlier isolated invocation did not load project hook files. It completed the edit without hooks; it is not counted as hook success. The harness now supplies its vetted hooks explicitly and asserts observed investigation and verification records.",
+  "cases": [
+    {
+      "elapsedMs": 17194,
+      "offline": false,
+      "codexExitCode": 0,
+      "investigations": [
+        {
+          "at": "2026-09-18T14:45:29.768Z",
+          "status": "needs_coding_agent",
+          "metrics": {
+            "totalMs": 1325,
+            "decisionMs": 1304,
+            "toolMs": 1,
+            "hostMs": 20,
+            "decisionCalls": 2,
+            "toolCalls": 1,
+            "generativeModelCalls": 0,
+            "inputTokens": 2387,
+            "outputTokens": 400
+          },
+          "checks": []
+        }
+      ],
+      "verifications": [
+        {
+          "at": "2026-09-18T14:45:39.813Z",
+          "status": "returned_results",
+          "metrics": {
+            "totalMs": 135,
+            "decisionMs": 0,
+            "toolMs": 134,
+            "hostMs": 1,
+            "decisionCalls": 0,
+            "toolCalls": 1,
+            "generativeModelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          },
+          "checks": [
+            {
+              "id": "membership-tests",
+              "exitCode": 0
+            }
+          ]
+        }
+      ],
+      "turnUsage": [
+        {
+          "input_tokens": 33507,
+          "cached_input_tokens": 16512,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 171,
+          "reasoning_output_tokens": 0
+        }
+      ],
+      "sourceChanged": true
+    },
+    {
+      "elapsedMs": 69987,
+      "offline": true,
+      "codexExitCode": 0,
+      "investigations": [
+        {
+          "at": "2026-09-18T14:45:29.967Z",
+          "status": "error",
+          "metrics": {
+            "totalMs": 519,
+            "decisionMs": 505,
+            "toolMs": 0,
+            "hostMs": 14,
+            "decisionCalls": 1,
+            "toolCalls": 0,
+            "generativeModelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          },
+          "checks": []
+        }
+      ],
+      "verifications": [
+        {
+          "at": "2026-09-18T14:46:33.268Z",
+          "status": "returned_results",
+          "metrics": {
+            "totalMs": 130,
+            "decisionMs": 0,
+            "toolMs": 129,
+            "hostMs": 1,
+            "decisionCalls": 0,
+            "toolCalls": 1,
+            "generativeModelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          },
+          "checks": [
+            {
+              "id": "membership-tests",
+              "exitCode": 0
+            }
+          ]
+        }
+      ],
+      "turnUsage": [
+        {
+          "input_tokens": 96783,
+          "cached_input_tokens": 66816,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 362,
+          "reasoning_output_tokens": 0
+        }
+      ],
+      "sourceChanged": true
+    }
+  ],
+  "regressionFoundAndFixed": "A read-only real-repository session initially ran verification after concurrent external edits. Stop now requires patch activity from its own session, with a regression test. Both recorded cases below ran after this fix."
+}

@@ -2,7 +2,7 @@
 
 The design separates selecting the next action from generating code. The host constructs concrete tool candidates and executes them; Jev chooses among those candidates; Codex is invoked for editing or explanation.
 
-![Jev-first task flow](diagrams/architecture.svg)
+![Everyday Codex task flow](diagrams/architecture.svg)
 
 [D2 source](diagrams/architecture.d2). GitHub does not list D2 among its [native diagram syntaxes](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams), so this repository embeds a committed SVG produced by the [D2 CLI](https://d2lang.com/tour/exports/). To regenerate it with D2 0.9.0, run `npm run diagram` from the repository root. The SVG contains its styling and fonts; viewing the README does not call a diagram-rendering service.
 
@@ -16,7 +16,15 @@ The design separates selecting the next action from generating code. The host co
 
 No generative-model call occurs between these steps. Confidence is retained in full traces but does not trigger repeated deliberation on an otherwise valid choice. Typed choice validation prevents dispatching an action outside the offered set; it does not establish task correctness.
 
-## Two integrations
+## Three integrations
+
+### Everyday hooks + MCP
+
+The installed `UserPromptSubmit` hook invokes the existing tool loop before Codex's first model call, with no configured commands and a short budget. It injects bounded source evidence and records private per-session state. The coding model stays in the normal Codex session.
+
+A `PreToolUse` hook recognizes exact complete reads and configured checks already supplied at the same revision. It blocks a duplicate once with the recorded evidence, then allows a deliberate retry. `PostToolUse` records this session's patch activity; `Stop` checks for resulting changes and runs explicitly selected verification commands, preserving exit codes and allowing bounded failure feedback. `Interrupt` cancels in-flight hook work. Additional MCP delegation stays available to Codex.
+
+Provider outages produce an explicit degraded-mode warning and keep native tools usable. No hook claims comprehensive routing or security enforcement. The [daily-use guide](DAILY-USE.md) defines coverage, trust setup, failure handling and state retention.
 
 ### MCP
 
@@ -25,6 +33,8 @@ The parent coding agent calls `run_tools` with a complete investigation goal, th
 When the caller supplies `commandIds`, the host executes those exact configured commands in order without indexing source or calling Jev. This mode returns check results only; it does not diagnose failures. Failed command exit codes remain visible even when the tool sequence returns normally.
 
 ### Jev-first supervisor
+
+[Supervisor D2 diagram](diagrams/supervisor.svg) · [source](diagrams/supervisor.d2)
 
 The supervisor starts `runTools()` directly. If a normally completed sequence contains only command results, it can format the result without invoking Codex. Otherwise it calls Codex with the original goal and collected evidence.
 
@@ -36,6 +46,8 @@ Observed check results replace model-authored check claims. This is important: t
 
 | File | Responsibility |
 | --- | --- |
+| `src/hooks.ts` / `src/hook-cli.ts` | Lifecycle handling, evidence freshness, cancellation, bounded verification |
+| `scripts/codex-integration.mjs` | Repeatable project installation, doctor and removal |
 | `src/workspace.ts` | Inventory, revisions, candidates, source/Git operations, command dispatch |
 | `src/jev.ts` | TypeSafe SDK adapter, Choice validation, usage |
 | `src/controller.ts` | Execution loop, direct checks, budgets, cancellation, observations |
