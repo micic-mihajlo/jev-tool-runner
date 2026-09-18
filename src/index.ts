@@ -5,3 +5,7 @@ export { loadConfig } from "./config.js";
 export { createMcpServer } from "./mcp.js";
 export { DEFAULT_CONFIG } from "./types.js";
 export type * from "./types.js";
+export { JevToolSelector } from "./tool-selector.js";
+export type { ToolSelector, ToolOffer, NativeCall, Selection, SelectionInput } from "./tool-selector.js";
+export { startRouter } from "./router-server.js";
+export { routingInput } from "./native-routing.js";

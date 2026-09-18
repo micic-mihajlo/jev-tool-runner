@@ -2,13 +2,14 @@
   "name": "jev-tool-runner",
   "version": "0.1.0",
   "private": true,
-  "description": "Let Jev choose and execute a sequence of developer tools without a generative model between calls.",
+  "description": "Jev selects native Codex tool calls; Codex executes them and owns the results.",
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "bin": {
-    "jev-tools": "./dist/cli.js"
+    "jev-tools": "./dist/cli.js",
+    "jev-codex": "./dist/router-cli.js"
   },
   "exports": "./dist/index.js",
   "scripts": {
@@ -21,7 +22,8 @@
     "test:all": "npm test && npm run test:supervisor && npm run test:accounting",
     "diagram": "d2 --layout elk --theme 0 --pad 24 docs/diagrams/architecture.d2 docs/diagrams/architecture.svg && d2 --layout elk --theme 0 --pad 24 docs/diagrams/supervisor.d2 docs/diagrams/supervisor.svg",
     "codex:install": "npm run build && node scripts/codex-integration.mjs install",
-    "codex:doctor": "node scripts/codex-integration.mjs doctor"
+    "codex:doctor": "node scripts/codex-integration.mjs doctor",
+    "codex:run": "npm run build && node dist/router-cli.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

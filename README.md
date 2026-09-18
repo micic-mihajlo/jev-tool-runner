@@ -1,146 +1,58 @@
-# Jev tool runner
+# Jev native tool router
 
-**Let a fast decision model run the tool loop. Call the coding model when you need code.**
+Jev selects a native Codex tool call **before the coding model is invoked**. Codex executes that call through its own tool runtime, approvals and sandbox. The result stays in Codex's conversation. The coding model handles reasoning, edits and the final answer.
 
-Jev chooses concrete source reads, searches, Git inspections, and configured commands. The runner executes each choice immediately and feeds the result back to Jev. Codex handles edits and explanations; the runner handles verification and a bounded repair retry.
+The router does not open repository files, execute commands, or conduct a separate investigation. TypeSafe receives the current user goal, a small set of tool choices, and completion metadata—not source-file output.
 
-Use it in ordinary Codex sessions with automatic hooks, or launch the standalone supervisor:
+![Native tool routing](docs/diagrams/architecture.svg)
 
-| Mode | Who starts the task? | Use it for |
-| --- | --- | --- |
-| **Codex hooks + MCP (daily use)** | Your normal Codex session | Automatic evidence before reasoning, reuse checks, and verification after edits |
-| **Jev-first CLI** | Jev, then Codex when needed | A complete investigation, edit, and verification cycle |
-| **MCP tool** | Your existing coding agent | Delegating an investigation or exact checks inside Codex |
+## Run it
 
-It does not replace Codex's built-in tool dispatcher. Jev selects from calls assembled by code; it does not generate patches or arbitrary shell commands.
-
-![Everyday Codex integration](docs/diagrams/architecture.svg)
-
-[Daily-use setup](docs/DAILY-USE.md) · [Architecture and D2 source](docs/ARCHITECTURE.md) · [Benchmarks](docs/benchmarks/README.md) · [Codex MCP setup](docs/CODEX.md)
-
-## Quick start
-
-Requirements: Node.js 22+, npm, [ripgrep](https://github.com/BurntSushi/ripgrep), and a [TypeSafe API key](https://docs.typesafe.ai/introduction/quickstart). The Jev-first mode also requires an authenticated Codex CLI. Git inspection is available inside a Git worktree.
+Requires Node.js 22+, an authenticated Codex CLI, and a TypeSafe key in a private env file. Verified with Codex CLI 0.153.4.
 
 ```sh
-git clone https://github.com/micic-mihajlo/jev-tool-runner.git
-cd jev-tool-runner
 npm ci
 npm run build
-cp .env.example .env
+
+# Start a normal interactive Codex session in your project:
+node /absolute/path/to/jev-tool-runner/dist/router-cli.js \
+  --key-file /absolute/path/to/private.env -- \
+  -C /absolute/path/to/your/project
 ```
 
-Set `TYPESAFE_API_KEY` in `.env`. That file is ignored by Git. The default model is `jev-1.13.0`.
+Ask a task that names source files, for example:
 
-Install into this checkout for everyday use:
+> Read src/access.mjs and test/access.test.mjs, then explain the access check.
+
+For an existing session, pass `resume SESSION_ID` after `--`. The wrapper supplies a local model provider for that process; it does not modify global Codex configuration or change the selected model, reasoning effort, permissions, or hook trust.
+
+[Daily use](docs/DAILY-USE.md) · [Architecture](docs/ARCHITECTURE.md) · [Live validation](docs/evidence/native-routing.json)
+
+## Current coverage
+
+The Codex adapter offers bounded, numbered reads of relative source paths explicitly named in the current user message. Jev chooses among at most eight offers or hands control to the coding model. Codex executes at most four selected calls before handoff. Completed calls are excluded. Unsupported requests, missing tool support, provider failures and timeouts fall back to the ordinary coding-model request.
+
+This is a working integration at the tool-decision boundary, with intentionally narrow candidate coverage. Automatic search planning, arbitrary command argument generation, test selection and browser/computer-use routing are not implemented. It does not replace every tool decision. The exported `ToolSelector` interface can choose among other host-supplied native calls without gaining execution privileges.
+
+The desktop app's already-running tasks are not patched by this wrapper. Use the wrapper to launch or resume a Codex CLI session. An optional MCP call or `PreToolUse` hook cannot remove reasoning that has already occurred; this implementation intercepts the model-provider request instead.
+
+## Verify it
 
 ```sh
-npm run codex:install -- --root "$PWD" \
-  --config examples/project-tools.json --key-file .env \
-  --verify tests,typecheck
-```
-
-Open a new trusted Codex session here and review/trust the definitions in `/hooks`. Then submit tasks normally: Jev automatically gathers bounded read-only evidence before Codex reasons, and the Stop hook runs the selected checks after edits. For another repository, use its absolute root and reviewed command configuration.
-
-```sh
-npm run codex:doctor -- --root "$PWD"
-```
-
-The doctor shows configuration health and recent observed hook activity. Hook installation alone does not prove execution. Provider outages visibly fall back to normal Codex; this is scoped workflow automation, not universal tool enforcement. See [daily-use behavior, limits, updates, and uninstall](docs/DAILY-USE.md).
-
-### Standalone read-only investigation
-
-Try a read-only investigation of the included deliberately broken fixture:
-
-```sh
-node --env-file=.env dist/cli.js run \
-  --root examples/membership-repo \
-  --config examples/demo-tools.json \
-  --goal "Run membership tests and inspect the failing test and implementation"
-```
-
-The failing test is intentional: removed memberships incorrectly retain access. A nonzero test exit code is returned as evidence; the CLI's own exit code describes the controller run.
-
-## Let Jev run a complete task
-
-Copy the fixture so the demonstration can edit it:
-
-```sh
-mkdir -p runs
-cp -R examples/membership-repo runs/membership-demo
-
-node --env-file=.env scripts/supervisor.mjs \
-  --root runs/membership-demo \
-  --config examples/demo-tools.json \
-  --output runs/membership-result \
-  --goal "Run the tests, fix access so only active memberships can receive messages, preserve tests, and verify the change."
-```
-
-The output directory must be new. `final.json` contains the answer and actual check results; `summary.json` contains timing and provider usage. Full tool and coding traces remain in the local output directory. Optional `--model`, `--effort`, and `--tier` configure the coding phase; otherwise Codex uses its configured defaults.
-
-See [the supervisor guide](SUPERVISOR.md) for limits, cancellation, artifacts, and retry behavior. For another repository, supply an explicit root and a reviewed command configuration.
-
-## Use inside Codex
-
-Start the MCP server with an explicit workspace:
-
-```sh
-node --env-file=/absolute/path/to/private.env /absolute/path/to/jev-tool-runner/dist/cli.js \
-  serve --root /absolute/path/to/project \
-  --config /absolute/path/to/reviewed-tools.json
-```
-
-Register it as `jev_tools` using the [portable TOML template](integration/codex.project.toml) and [setup guide](docs/CODEX.md). An investigation takes a single goal:
-
-```json
-{"goal":"Run the tests, inspect any failure and its implementation, and return the evidence needed for a fix."}
-```
-
-For exact checks, bypass model decisions:
-
-```json
-{"goal":"Run tests and type checking.","commandIds":["tests","typecheck"]}
-```
-
-Use command IDs from your configuration. Omit `commandIds` when diagnosis is needed. The server manages the step budget; callers do not supply `maxSteps`. Reuse returned evidence and inspect exit codes before claiming success.
-
-## Earlier supervisor benchmark
-
-These results measure the standalone supervisor, **not the new daily-use hooks**.
-
-An 18-run paired experiment used three tasks, three repeats per arm, and the same requested Codex model/settings (GPT-5.6 Sol, medium reasoning, priority service):
-
-| Aggregate over nine tasks | Plain Codex | Jev-first |
-| --- | ---: | ---: |
-| Graded completions | 9/9 | 9/9 |
-| Total wall time | 353.6 s | 146.1 s |
-| Codex input tokens | 757,093 | 184,709 |
-| Estimated combined API cost | $2.1759 | $0.7995 |
-
-That is **58.7% less time and 63.3% lower estimated cost**, including Jev. All nine pairs were faster. Excluding the check-only tasks still gave 56.9% less time and 57.5% lower estimated cost.
-
-These are small-task results, not broad coding-agent performance claims. Dollar figures are API-equivalent estimates; subscription quota and billing savings were not measured. The [benchmark report](docs/benchmarks/README.md) includes all three iterations—including the slower initial implementation—methods, limitations, per-run numeric data, and reproduction commands. Raw session logs and machine-specific paths are not published.
-
-## Development
-
-```sh
-npm run test:all  # runner, hook/installer, supervisor, and accounting tests
+npm run test:all
 npm run check
+
+node scripts/router-live-smoke.mjs \
+  --root /absolute/path/to/repo \
+  --goal 'Read src/access.mjs and explain its access check. Do not edit anything.' \
+  --key-file /absolute/path/to/private.env \
+  --output runs/new-live-run
 ```
 
-Tests use local contract providers and real filesystem/subprocess/MCP operations. Live smoke tests and benchmarks call external services and are run explicitly. GitHub Actions runs the local suite on Linux and macOS with Node 22.
+The live harness asserts that Jev actually selected a call before the first coding-model request, that Codex actually executed the selected read, and that the coding model answered. It retains failed runs too. Add `--baseline` for an ordinary Codex comparison or `--offline` for the provider-outage check. These runs consume usage; they are not run by CI.
 
-Edit `docs/diagrams/architecture.d2` and regenerate the committed SVG with D2 0.9.0:
+## Earlier implementation
 
-```sh
-npm run diagram
-```
+The older autonomous runner, MCP server and investigation hooks remain available for compatibility. They are **not** the native tool selector, and their [historical benchmarks](docs/benchmarks/README.md) do not establish savings for this architecture. [Legacy hooks and removal](docs/LEGACY-HOOKS.md) · [Legacy MCP setup](docs/CODEX.md).
 
-## Boundaries
-
-- Jev's available actions are bounded: permitted source reads, literal searches, directory listings, scoped Git inspection, and allowlisted command arguments. Missing candidates can limit an investigation.
-- Commands use `shell: false` and do not inherit the TypeSafe key. Configured commands can execute project code with the server's operating-system permissions; the tool runner is not an OS sandbox.
-- Selected source and tool output are sent to TypeSafe. The coding phase sends its goal and collected evidence to Codex. Conventional secret paths are excluded and known credentials are redacted, but arbitrary source can still contain sensitive data.
-- Codex edits run through its workspace-write sandbox. Automatic hooks have their own bounded budgets and do not sandbox configured checks. There is a 180-second supervisor budget and at most two coding attempts. Browser/computer control and third-party MCP tool adapters are not implemented.
-
-[TypeSafe System One](https://docs.typesafe.ai/concepts/system-one) · [JavaScript SDK](https://docs.typesafe.ai/sdk/javascript) · [Choice primitive](https://docs.typesafe.ai/primitives/choice)
+[TypeSafe function calling](https://docs.typesafe.ai/cookbooks/function_calling) · [Codex custom model providers](https://developers.openai.com/codex/config-advanced#custom-model-providers)

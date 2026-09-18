@@ -1,0 +1,108 @@
+{
+  "codexVersion": "0.153.4",
+  "model": "Codex default; gpt-6-astra observed in the protocol probe",
+  "scope": "Actual Codex CLI execution against a private two-file source task, plus a fictional outage fixture. Source, paths, goals and full session logs are omitted.",
+  "method": "Same user prompt for native-routing and baseline source tasks; default Codex model and settings retained. Router intercepts the Responses request, emits a native call selected by Jev, and forwards later requests to the coding model. Host skill discovery and subsequent model-selected tools were not eliminated.",
+  "limitations": [
+    "Small exploratory sample, not a randomized benchmark or evidence of general cost savings.",
+    "Cache usage and later model behavior differ across runs.",
+    "The initial routing run used unnumbered reads; the final implementation uses numbered reads.",
+    "An earlier wrapper smoke run accidentally ignored provider configuration, executed ordinary Codex, and had no audit events. It is excluded from routing successes. The live harness now requires observed selections, native execution and ordering before model inference.",
+    "Automatic desktop task reconfiguration is not established.",
+    "Normal and ephemeral resume of an existing desktop task both failed before execution because the desktop held its active writer lock. The successful trials used actual Codex CLI sessions in the same source worktree, not a hot-swapped desktop task."
+  ],
+  "cases": [
+    {
+      "label": "native-routing-initial",
+      "baseline": false,
+      "offline": false,
+      "elapsedMs": 29926,
+      "codexExitCode": 0,
+      "decisions": 2,
+      "jevInputTokens": 1069,
+      "jevOutputTokens": 76,
+      "jevDecisionMs": 1420,
+      "upstreamResponseRequests": 2,
+      "firstDecisionBeforeUpstream": true,
+      "nativeCommandCount": 4,
+      "usage": [
+        {
+          "input_tokens": 39642,
+          "cached_input_tokens": 9984,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 565,
+          "reasoning_output_tokens": 26
+        }
+      ]
+    },
+    {
+      "label": "native-routing-numbered-reads",
+      "baseline": false,
+      "offline": false,
+      "elapsedMs": 33770,
+      "codexExitCode": 0,
+      "decisions": 2,
+      "jevInputTokens": 1073,
+      "jevOutputTokens": 76,
+      "jevDecisionMs": 1249,
+      "upstreamResponseRequests": 3,
+      "firstDecisionBeforeUpstream": true,
+      "nativeCommandCount": 6,
+      "usage": [
+        {
+          "input_tokens": 60763,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 597,
+          "reasoning_output_tokens": 15
+        }
+      ]
+    },
+    {
+      "label": "ordinary-codex-baseline",
+      "baseline": true,
+      "offline": false,
+      "elapsedMs": 31741,
+      "codexExitCode": 0,
+      "decisions": 0,
+      "jevInputTokens": 0,
+      "jevOutputTokens": 0,
+      "jevDecisionMs": 0,
+      "upstreamResponseRequests": null,
+      "firstDecisionBeforeUpstream": null,
+      "nativeCommandCount": 4,
+      "usage": [
+        {
+          "input_tokens": 56153,
+          "cached_input_tokens": 34048,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 561,
+          "reasoning_output_tokens": 27
+        }
+      ]
+    },
+    {
+      "label": "provider-outage-fixture",
+      "baseline": false,
+      "offline": true,
+      "elapsedMs": 19125,
+      "codexExitCode": 0,
+      "decisions": 0,
+      "jevInputTokens": 0,
+      "jevOutputTokens": 0,
+      "jevDecisionMs": 0,
+      "upstreamResponseRequests": 2,
+      "firstDecisionBeforeUpstream": false,
+      "nativeCommandCount": 2,
+      "usage": [
+        {
+          "input_tokens": 34451,
+          "cached_input_tokens": 13824,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 298,
+          "reasoning_output_tokens": 14
+        }
+      ]
+    }
+  ]
+}

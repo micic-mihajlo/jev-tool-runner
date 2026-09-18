@@ -1,6 +1,6 @@
 # Use the MCP tool in Codex
 
-For automatic use in normal sessions, follow [hooks + MCP installation](DAILY-USE.md). The setup below registers only the MCP tool; it does not automatically invoke Jev.
+This is the legacy autonomous investigator. For native Codex tool selection before a coding-model call, use the [provider router](DAILY-USE.md). The setup below registers only the old MCP tool and does not replace Codex's tool decisions.
 
 Build the package first with `npm ci && npm run build`. Keep the TypeSafe key in a private environment file. Choose a fixed repository root and a reviewed command configuration.
 

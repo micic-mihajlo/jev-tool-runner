@@ -1,25 +1,23 @@
-direction: down
-vars: {d2-config: {layout-engine: elk; theme-id: 0}}
+direction: right
 classes: {
-  hook: {style: {fill: "#E8F5EF"; stroke: "#318065"; border-radius: 10}}
-  model: {style: {fill: "#E5EEFF"; stroke: "#315BB5"; border-radius: 10}}
-  result: {style: {fill: "#FFF4DC"; stroke: "#AB7C27"; border-radius: 10}}
+  box: {
+    style: {
+      border-radius: 10
+      fill: "#eef4ff"
+      stroke: "#4f6b9a"
+    }
+  }
 }
-prompt: "Normal Codex task" {class: result}
-pre: "UserPromptSubmit hook\nJev selects and executes bounded reads\n6 steps / 15 seconds by default" {class: hook}
-fallback: "Provider unavailable\nContinue with native tools\nShow degraded status" {class: result}
-evidence: "Fresh source evidence\nPrivate session state + measured usage" {class: hook}
-codex: "Codex reasons and edits\nMay delegate more investigation to Jev MCP" {class: model}
-guard: "PreToolUse hook\nExact redundant read/check: return prior evidence\nOne correction; deliberate retry stays available" {class: hook}
-stop: "Stop: this session patched files?\nRun configured checks once per revision\nNo Jev decision for known checks" {class: hook}
-done: "Result + actual verification status\nFailures get bounded continuation\nOutages are explicitly reported" {class: result}
-prompt -> pre
-pre -> evidence: collected observations
-evidence -> codex
-pre -> fallback
-fallback -> codex
-codex -> guard: supported shell calls
-guard -> codex: evidence or normal execution
-codex -> stop: end of edited turn
-stop -> codex: failed check + retry available
-stop -> done: passed / unchanged / incomplete
+request: "Codex requests next step" { class: box }
+router: "Local provider adapter\nBuild eligible native calls" { class: box }
+jev: "Jev selects ONE call\nGoal + call metadata only" { class: box }
+runtime: "Codex tool runtime\nNormal approvals + sandbox" { class: box }
+result: "Actual tool result\nStays in Codex conversation" { class: box }
+model: "Coding model\nReasoning, edits, final answer" { class: box }
+request -> router
+router -> jev: eligible
+jev -> runtime: native tool-call response
+runtime -> result
+result -> request: next step
+router -> model: unsupported / complete / failure
+jev -> model: handoff

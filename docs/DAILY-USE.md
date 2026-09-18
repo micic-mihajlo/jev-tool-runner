@@ -1,82 +1,66 @@
-# Everyday Codex integration
+# Use Jev inside the Codex tool-decision loop
 
-Install once in a trusted repository, review its hooks, and continue using normal Codex sessions. You do not need to launch the standalone supervisor for each task.
+Build the package with `npm ci && npm run build`. Keep a private env file containing `TYPESAFE_API_KEY`.
 
-The integration combines automatic hooks with the `jev_tools.run_tools` MCP server. It is supported on macOS and Linux. The live CLI check uses Codex 0.153.4; the desktop uses the same configuration format, but desktop hook execution must be confirmed in a new session with the doctor command.
-
-## Install
-
-From this package, after `npm ci`:
+From any repository, launch:
 
 ```sh
-npm run codex:install -- \
-  --root /absolute/path/to/your/project \
-  --config /absolute/path/to/reviewed-tools.json \
-  --key-file /absolute/path/to/private.env \
-  --verify tests,typecheck
+node /absolute/path/to/jev-tool-runner/dist/router-cli.js \
+  --key-file /absolute/path/to/private.env -- \
+  -C /absolute/path/to/project
 ```
 
-The private env file contains `TYPESAFE_API_KEY`. Keep it outside tracked source and readable only by your account. `--verify` names exact commands in the reviewed configuration. Omit it to disable automatic verification. Commands can execute project code with the hook process's permissions, so only include checks you intend to run automatically after edits. A TypeScript example is [project-tools.json](../examples/project-tools.json).
+The wrapper starts a loopback-only Responses router, launches Codex with a temporary custom-provider configuration, and closes the router when Codex exits. Your normal model and permission settings remain in force. The TypeSafe key and any extra variables loaded from its private env file are not passed to Codex. Existing upstream authentication is forwarded only to the configured official OpenAI endpoint; it is never sent to TypeSafe or written to the audit log.
 
-The installer merges handlers into `.codex/hooks.json` and adds a marked MCP section to `.codex/config.toml`. It preserves unrelated hooks and settings, refuses an unmanaged `jev_tools` collision, and keeps initial backups in `.codex/jev/`. It stores private settings and state there, too. It adds a local Git exclusion for `.codex/`; already-tracked files still require your attention. The API key is never copied into these generated files.
+The default upstream is the ChatGPT Codex endpoint and uses your existing Codex login. For API authentication, set `--upstream https://api.openai.com/v1` and use Codex's normal API login. Do not pass an unrelated proxy endpoint: the router rejects it.
 
-**Open a new trusted Codex session in the target project and use `/hooks` to review and trust the installed definitions.** Codex requires this review; installation does not grant trust. Changed hook definitions require another review. Do not use the test harness's trust-bypass flag for everyday sessions. Restart existing sessions after installation or updates so MCP and hook registrations refresh.
+## Existing tasks
 
-Check the installation:
+Use `resume` through the wrapper:
 
 ```sh
-npm run codex:doctor -- --root /absolute/path/to/your/project
+node /absolute/path/to/jev-tool-runner/dist/router-cli.js \
+  --key-file /absolute/path/to/private.env -- \
+  resume YOUR_SESSION_ID
 ```
 
-The doctor checks registration, prerequisites, command IDs, and key-file readability. `lastObservedHooks` shows up to five recent per-session investigation/verification records since the latest installation. An empty list means execution has not been observed; a configured file alone does not establish that hooks ran. The doctor cannot establish Codex's trust state: use `/hooks` for that.
+Do not simultaneously operate the same session from the desktop and CLI. This wrapper does not hot-swap the provider of a task already running in the desktop. It also does not install global hooks or change your account's model settings.
 
-## What happens during a task
+## What Jev does
 
-1. **SessionStart** supplies concise instructions about evidence reuse, MCP delegation, and data disclosure.
-2. **UserPromptSubmit** starts Jev before the coding model. Jev chooses bounded repository reads/searches/Git inspection with no coding-model round trips. It cannot execute configured shell commands in this automatic phase. Defaults: six steps and 15 seconds, configurable with installer `--timeout` up to 30 seconds. Simple acknowledgments are skipped. Collected evidence is capped at 18,000 characters.
-3. **Codex** uses that evidence to edit or explain. If more investigation is necessary, it can call `jev_tools.run_tools`. Known checks can use `commandIds` with zero Jev decisions. This additional delegation remains a model choice.
-4. **PreToolUse** catches a narrow set of exact redundant shell calls: a complete `cat relative/path` already supplied by the hook, or an exact configured check already recorded at the current revision. It returns the previous result instead of permitting the redundant call. A deliberate retry is allowed after one correction, preventing denial loops. Compound shell commands, partial/paginated reads, different working directories, and unrecognized calls are left alone.
-5. **PostToolUse** records patch activity from this Codex session. **Stop** compares the workspace revision. If this session used `apply_patch` and files changed, it runs the configured verification commands directly, once for that revision, preserving actual exit codes. The first failed verification can continue Codex with the failure evidence. Further unchanged stops do not rerun checks, and at most two automatic verification attempts are allowed per turn. A later failure or exhausted budget is visibly reported; it is not relabeled success.
-6. **Interrupt** marks the active session cancelled; the running hook aborts its model/tool operation. SessionEnd also signals cancellation. Cancellation is scoped to the session.
+When Codex is about to request a model response, the adapter examines the current user message and Codex's advertised tools. For supported requests it constructs a small set of concrete native calls. Jev chooses one or hands off. A chosen call returns through the normal Responses tool-call stream; Codex executes it. The next request already contains Codex's tool result. Once available calls are done, the original request and full results go to the coding model.
 
-There is deliberately no test run after every individual patch. Changes are checked at the end of a turn. Edits made through arbitrary shell commands require explicit checks; they are not attributed automatically. External edits alone do not trigger verification in a read-only task. The revision follows the runner's metadata-based inventory and exclusions; preserving both size and mtime, excluded files, or the inventory cap can hide changes. This is not a content-hash completeness guarantee.
+Currently supported offers are reads of explicitly named relative source files, capped at 160 numbered lines and the native output budget. At most four calls are selected in one initial sequence. Paths outside this adapter's narrow syntax, credential paths, unsupported tools, missing context, stored-response continuations, and a coding-model continuation go directly to the coding model. This is not general repository exploration or automatic test selection.
 
-## Failure behavior and limits
+Jev receives goal text, offer descriptions and call completion IDs. It does not receive source output, developer instructions, authentication headers or the whole conversation. There is no source inventory and no filesystem/tool executor in the routing component. The host remains responsible for permissions; a Jev choice does not grant approval. A tool failure remains in the Codex conversation, and the coding model handles it.
 
-Provider failure or timeout produces a visible degraded-mode message and allows normal Codex tools to continue. Exact post-edit verification does not require a functioning TypeSafe API. A missing or unreadable installation/env file can prevent the handler from reaching verification; that produces an unavailable warning. Do not report verification success from an absent hook.
+## Observe and stop
 
-The session lock avoids duplicate concurrent work. Locks left by a crashed process expire after the longer configured run budget plus one minute. Evidence collected across an observed concurrent workspace change is withheld. State is isolated by hashed session ID and turn ID, so one task cannot consume another's cached observations.
-
-Hooks are a workflow integration, not an unbypassable tool dispatcher or security boundary. They can be untrusted, disabled, unavailable, or bypassed by unsupported tool paths; an error in a hook does not generally block Codex. Hosted tools and some specialized paths have different coverage. The integration does not claim to route every tool through Jev or eliminate coding-model reasoning. See the [official hook coverage and failure contract](https://learn.chatgpt.com/docs/hooks#tool-coverage).
-
-Automatic hooks send selected source and tool output to TypeSafe. Locally retained evidence can contain source, and is written with private permissions under `.codex/jev/state`. Only the latest investigation and verification summary per session is retained; these contain timing, token counts and check exit codes, not the prompt or source. The separate session state contains the bounded evidence. There is no remote telemetry service. Remove old state when no session is using it.
-
-## Update or uninstall
-
-Keep the package checkout at a stable path. Build updated source with `npm ci && npm run build`, rerun the install command, restart Codex, and review any changed hook definitions. The installer is repeatable and does not accumulate duplicate handlers. It refuses to overwrite an edited managed MCP section.
+Add a new private audit path before `--`:
 
 ```sh
-node scripts/codex-integration.mjs uninstall --root /absolute/path/to/your/project
+--audit /absolute/path/to/new-router-log.jsonl
 ```
 
-Uninstall removes only its own handlers and marked MCP section. It preserves unrelated configuration, initial backups, and private run state. Restart the Codex session afterward.
+Audit events distinguish `selected`, `handoff`, `fallback`, and `upstream`. A `selected` event records TypeSafe time and token usage, plus `upstreamRequestSkipped: true`. Model-list requests are ordinary initialization, not coding-model inference. Native tool execution appears in Codex's own transcript. Correlate both when validating routing.
 
-## Verification
+Logs omit prompts, source output, raw tool arguments and credentials. Zero usage on a synthetic Responses tool call means no OpenAI generation occurred for that response; TypeSafe usage is recorded separately. Do not treat it as a free overall task.
 
-The local tests exercise real filesystem state, subprocess checks, freshness, duplicate handling, outages, interruption, session isolation, installation, and removal. They use a controlled decision provider to isolate those contracts.
+Closing Codex stops the local router. To use ordinary Codex again, launch `codex` directly. No configuration rollback is required.
 
-[Recorded live smoke results](evidence/codex-hooks.json) include a successful provider-backed run and an outage run. They demonstrate actual hook execution, edits and passing verification, not production-wide reliability or measured savings.
+## Remove the old investigation hooks
 
-The optional live check runs an actual Codex process and actual TypeSafe requests against a disposable fixture:
+If you installed the earlier hooks in a project, remove them before testing native routing:
 
 ```sh
-mkdir -p runs
-node scripts/codex-live-smoke.mjs \
-  --key-file /absolute/path/to/private.env --output runs/live-hooks
-node scripts/codex-live-smoke.mjs \
-  --key-file /absolute/path/to/private.env --output runs/offline-hooks --offline
+node /absolute/path/to/jev-tool-runner/scripts/codex-integration.mjs \
+  uninstall --root /absolute/path/to/project
 ```
 
-Both output paths must be new. These consume Codex usage; the first also calls TypeSafe. The harness asserts that UserPromptSubmit actually ran, a real implementation edit happened, and Stop actually ran a passing check. It retains raw events and summaries locally. The offline case points the hook at an unavailable local endpoint and requires normal coding plus verification to recover.
+That preserves other hooks, settings and prior evidence. Restart existing sessions to unload the old registration. Hook-based autonomous investigation is a separate legacy implementation and is not part of this router.
 
-The harness's isolated CLI mode does not discover project file configuration in the tested CLI build, so it supplies the installed fixture hook definitions explicitly. Only these vetted fixture hooks use the per-invocation hook-trust bypass. This validates hook execution, not a user's trust approval or desktop UI. Normal project MCP discovery is checked separately. The older [benchmarks](benchmarks/README.md) measure the MCP/supervisor implementations; their savings are not evidence of this hook integration's everyday savings.
+## Validation limits
+
+Local integration tests cover selection, source isolation, duplicate suppression, streaming, authentication, upstream forwarding and provider failure. The opt-in live harness launches the actual Codex CLI with normal permissions. It must observe both a selected call and native execution before reporting success.
+
+The checked-in evidence contains sanitized metrics only. Private source and session logs stay local. The sample is small; cache state, extra model-selected tools and network time affect end-to-end comparisons. It does not establish broad cost savings or desktop hot-integration.
